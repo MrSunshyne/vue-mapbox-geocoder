@@ -1941,6 +1941,14 @@ var geocoderEvents = {
   inject: ["mapbox", "map"],
   props: {
     // Mapbox-geocoder options
+    position: {
+      type: String,
+      default: "top-right"
+    },
+    container: {
+      type: String,
+      default: null
+    },
     accessToken: {
       type: String,
       required: true
@@ -2043,7 +2051,11 @@ var geocoderEvents = {
   },
   methods: {
     $_deferredMount: function $_deferredMount() {
-      this.map.addControl(this.control);
+      if (this.container !== null) {
+        document.getElementById(this.container).appendChild(this.control.onAdd(this.map));
+      } else {
+        this.map.addControl(this.control, this.position);
+      }
 
       if (this.input) {
         this.control.setInput(this.input);
@@ -2080,7 +2092,7 @@ var geocoderEvents = {
     query: function query(_query) {
       if (this.control) {
         this.$emit("update:input", _query);
-        return this.contol.query(_query);
+        return this.control.query(_query);
       }
 
       return null;
